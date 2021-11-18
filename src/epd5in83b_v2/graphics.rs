@@ -21,7 +21,8 @@ impl Default for Display5in83 {
             rotation: DisplayRotation::default(),
         };
         // We need to invert chromatic part to black so it will be render white
-        display.buffer[display.chromatic_offset()..].fill(0x00);
+        let offset = display.chromatic_offset();
+        display.buffer[offset..].fill(0x00);
         display
     }
 }
