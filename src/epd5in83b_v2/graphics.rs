@@ -1,14 +1,16 @@
-use crate::epd5in83b_v2::{DEFAULT_BACKGROUND_COLOR, HEIGHT, WIDTH};
+use crate::epd5in83b_v2::{DEFAULT_BACKGROUND_COLOR, HEIGHT, NUM_DISPLAY_BITS, WIDTH};
 use crate::graphics::{Display, DisplayRotation};
 use embedded_graphics_core::pixelcolor::BinaryColor;
 use embedded_graphics_core::prelude::*;
+use crate::color::TriColor;
+use crate::prelude::TriDisplay;
 
-/// Full size buffer for use with the 7in5 EPD
+/// Full size buffer for use with the 5in83 EPD
 ///
 /// Can also be manually constructed:
-/// `buffer: [DEFAULT_BACKGROUND_COLOR.get_byte_value(); WIDTH / 8 * HEIGHT]`
+/// `buffer: [DEFAULT_BACKGROUND_COLOR.get_byte_value(); 2 * NUM_DISPLAY_BITS as usize]`
 pub struct Display5in83 {
-    buffer: [u8; WIDTH as usize * HEIGHT as usize / 8],
+    buffer: [u8; 2 * NUM_DISPLAY_BITS as usize],
     rotation: DisplayRotation,
 }
 
@@ -16,14 +18,14 @@ impl Default for Display5in83 {
     fn default() -> Self {
         Display5in83 {
             buffer: [DEFAULT_BACKGROUND_COLOR.get_byte_value();
-                WIDTH as usize * HEIGHT as usize / 8],
+                2 * NUM_DISPLAY_BITS as usize],
             rotation: DisplayRotation::default(),
         }
     }
 }
 
 impl DrawTarget for Display5in83 {
-    type Color = BinaryColor;
+    type Color = TriColor;
     type Error = core::convert::Infallible;
 
     fn draw_iter<I>(&mut self, pixels: I) -> Result<(), Self::Error>
@@ -31,7 +33,7 @@ impl DrawTarget for Display5in83 {
         I: IntoIterator<Item = Pixel<Self::Color>>,
     {
         for pixel in pixels {
-            self.draw_helper(WIDTH, HEIGHT, pixel)?;
+            self.draw_helper_tri(WIDTH, HEIGHT, pixel)?;
         }
         Ok(())
     }
@@ -43,7 +45,7 @@ impl OriginDimensions for Display5in83 {
     }
 }
 
-impl Display for Display5in83 {
+impl TriDisplay for Display5in83 {
     fn buffer(&self) -> &[u8] {
         &self.buffer
     }
@@ -58,6 +60,18 @@ impl Display for Display5in83 {
 
     fn rotation(&self) -> DisplayRotation {
         self.rotation
+    }
+
+    fn chromatic_offset(&self) -> usize {
+        NUM_DISPLAY_BITS as usize
+    }
+
+    fn bw_buffer(&self) -> &[u8] {
+        &self.buffer[0..self.chromatic_offset()]
+    }
+
+    fn chromatic_buffer(&self) -> &[u8] {
+        &self.buffer[self.chromatic_offset()..]
     }
 }
 
