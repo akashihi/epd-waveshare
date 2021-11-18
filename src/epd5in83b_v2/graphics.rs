@@ -24,12 +24,12 @@ impl Display5in83 {
         let rotation = self.rotation();
 
         let Pixel(point, color) = pixel;
-        if outside_display(point, width, height, rotation) {
+        if self.outside_display(point, width, height, rotation) {
             return ();
         }
 
         // Give us index inside the buffer and the bit-position in that u8 which needs to be changed
-        let (index, bit) = find_position(point.x as u32, point.y as u32, width, height, rotation);
+        let (index, bit) = self.find_position(point.x as u32, point.y as u32, width, height, rotation);
         let index = index as usize;
         let offset = self.chromatic_offset();
 
