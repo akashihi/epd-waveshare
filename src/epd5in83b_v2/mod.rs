@@ -250,9 +250,8 @@ where
         self.interface
             .data_x_times(spi, 0x33, NUM_DISPLAY_BITS)?;
 
-        let color = self.color.get_byte_value();
         self.command(spi, Command::DataStartTransmission2)?;
-        self.interface.data_x_times(spi, color, NUM_DISPLAY_BITS)?;
+        self.interface.data_x_times(spi, 0x00, NUM_DISPLAY_BITS)?;
 
         Ok(())
     }
