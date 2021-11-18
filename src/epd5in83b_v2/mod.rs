@@ -13,7 +13,8 @@ use embedded_hal::{
 
 use crate::color::Color;
 use crate::interface::DisplayInterface;
-use crate::traits::{InternalWiAdditions, RefreshLut, WaveshareDisplay, WaveshareThreeColorDisplay};
+use crate::traits::{InternalWiAdditions, RefreshLut};
+use crate::prelude::{WaveshareDisplay, WaveshareThreeColorDisplay};
 
 pub(crate) mod command;
 use self::command::Command;

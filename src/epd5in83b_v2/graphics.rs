@@ -14,6 +14,52 @@ pub struct Display5in83 {
     rotation: DisplayRotation,
 }
 
+impl Display5in83 {
+    fn draw_helper_tri_inverted(
+        &mut self,
+        width: u32,
+        height: u32,
+        pixel: Pixel<TriColor>,
+    ) -> Result<(), Self::Error> {
+        let rotation = self.rotation();
+
+        let Pixel(point, color) = pixel;
+        if outside_display(point, width, height, rotation) {
+            return Ok(());
+        }
+
+        // Give us index inside the buffer and the bit-position in that u8 which needs to be changed
+        let (index, bit) = find_position(point.x as u32, point.y as u32, width, height, rotation);
+        let index = index as usize;
+        let offset = self.chromatic_offset();
+
+        let buffer = self.get_mut_buffer();
+
+        // "Draw" the Pixel on that bit
+        match color {
+            TriColor::Black => {
+                // clear bit in bw-buffer -> black
+                buffer[index] &= !bit;
+                // clear bit in chromatic buffer -> chromatic
+                buffer[index + offset] &= !bit;
+            }
+            TriColor::White => {
+                // set bit in bw-buffer -> white
+                buffer[index] |= bit;
+                // clear bit in chromatic buffer -> chromatic
+                buffer[index + offset] &= !bit;
+            }
+            TriColor::Chromatic => {
+                // clear bit in bw-buffer -> black
+                buffer[index] &= !bit;
+                // set bit in chromatic-buffer -> white
+                buffer[index + offset] |= bit;
+            }
+        }
+        Ok(())
+    }
+}
+
 impl Default for Display5in83 {
     fn default() -> Self {
         Display5in83 {
@@ -33,7 +79,7 @@ impl DrawTarget for Display5in83 {
         I: IntoIterator<Item = Pixel<Self::Color>>,
     {
         for pixel in pixels {
-            self.draw_helper_tri(WIDTH, HEIGHT, pixel)?;
+            self.draw_helper_tri_inverted(WIDTH, HEIGHT, pixel)?;
         }
         Ok(())
     }
