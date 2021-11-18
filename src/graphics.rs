@@ -193,8 +193,8 @@ pub trait TriDisplay: DrawTarget<Color = TriColor> {
                         buffer[index + offset] &= !bit;
                     }
                     DisplayColorRendering::Negative => {
-                        // clear bit in bw-buffer -> black
-                        buffer[index] &= !bit;
+                        // set bit in b/w buffer (white)
+                        buffer[index] |= bit;
                         // set bit in chromatic-buffer -> chromatic
                         buffer[index + offset] |= bit;
                     }
