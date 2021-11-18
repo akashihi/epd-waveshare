@@ -248,7 +248,7 @@ where
         // The Waveshare controllers all implement clear using 0x33
         self.command(spi, Command::DataStartTransmission1)?;
         self.interface
-            .data_x_times(spi, 0x33, NUM_DISPLAY_BITS)?;
+            .data_x_times(spi, 0xFF, NUM_DISPLAY_BITS)?;
 
         self.command(spi, Command::DataStartTransmission2)?;
         self.interface.data_x_times(spi, 0x00, NUM_DISPLAY_BITS)?;
