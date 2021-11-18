@@ -15,11 +15,14 @@ pub struct Display5in83 {
 
 impl Default for Display5in83 {
     fn default() -> Self {
-        Display5in83 {
+        let mut display = Display5in83 {
             buffer: [DEFAULT_BACKGROUND_COLOR.get_byte_value();
                 2 * NUM_DISPLAY_BITS as usize],
             rotation: DisplayRotation::default(),
-        }
+        };
+        // We need to invert chromatic part to black so it will be render white
+        display.buffer[display.chromatic_offset()..].fill(0x00);
+        display
     }
 }
 
