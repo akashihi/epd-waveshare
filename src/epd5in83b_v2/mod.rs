@@ -221,6 +221,9 @@ where
         self.command(spi, Command::DataStartTransmission2)?;
         self.interface.data_x_times(spi, color, width * height / 8)?;
 
+        self.command(spi, Command::DisplayRefresh)?;
+        self.wait_until_idle();
+        
         self.command(spi, Command::PartialOut)?;
         Ok(())
     }
